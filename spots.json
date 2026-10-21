@@ -310,5 +310,17 @@
     "rating": "3.9 ⭐",
     "desc": "Franchise famous for deep-dish stuffed cookies, brookies, cookie cakes, and themed boxes.",
     "img": "https://www.yaycork.ie/wp-content/uploads/2026/02/Screenshot-2026-02-02-at-08.59.56-1200x784.png"
+  },
+  {
+    "id": 28,
+    "name": "Pistacchio Ola Crumble Cookies",
+    "location": "Kazimierz, Krakow, Poland",
+    "region": "Europe",
+    "category": "approved",
+    "lat": 50.05091935455641,
+    "lng": 19.949479243236915,
+    "rating": "4.9 ⭐",
+    "desc": "Freshly baked homemade cookies in a historic neighbourhood",
+    "img": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2e/74/e6/38/freshly-baked-pistacchio.jpg?w=1100&h=1100&s=1"
   }
 ]
