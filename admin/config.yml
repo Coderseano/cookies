@@ -1,9 +1,9 @@
 backend:
   name: github
-  repo: Coderseano/cookies # e.g. john-doe/cookies
+  repo: coderseano/cookies
   branch: main
-  base_url: https://api.decapcms.org
-  auth_endpoint: auth
+  base_url: https://decap-cms-oauth-provider.vercel.app
+  auth_endpoint: oauth
 
 media_folder: "images"
 public_folder: "/images"
