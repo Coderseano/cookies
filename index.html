@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Cookie Corner Atlas</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- Warm Google Font: Quicksand -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Leaflet CSS & MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" />
+    
+    <style>
+        :root {
+            --primary-accent: #D4A373;
+            --primary-hover: #b04b25;
+            --bg-warm: #5C3A21;
+            --card-bg: #f9f4ec;
+            --card-border: #ede4d6;
+            --text-main: #2c2523;
+            --text-muted: #786c67;
+            --font-warm: 'Quicksand', system-ui, -apple-system, sans-serif;
+
+            /* Lighter Warm Feed Variables */
+            --feed-bg: #472B18;
+            --feed-border: rgba(255, 255, 255, 0.1);
+            --feed-card-bg: #F7EBE1;
+            --feed-card-hover: #FFFFFF;
+            --feed-text-main: #2C1A0E;
+            --feed-text-muted: #7A5C47;
+            --feed-header-bg: #382112;
+            --feed-header-text: #E8D5C8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body { 
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: var(--bg-warm); 
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* --- GLOBAL NAVIGATION HEADER --- */
+        .navbar {
+            height: 70px;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-warm);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            position: sticky;
+            top: 0;
+            z-index: 2000;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-warm);
+            font-weight: 700;
+            font-size: 22px;
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .nav-link {
+            font-family: var(--font-warm);
+            font-size: 15px;
+            font-weight: 600;
+            color: #e0d4fc;
+            text-decoration: none;
+            cursor: pointer;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-accent);
+            border-color: var(--primary-accent);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-buy-cookie {
+            font-family: var(--font-warm);
+            background: #fff8ef;
+            color: var(--primary-accent);
+            border: 1px solid #f2cfb3;
+            padding: 9px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-buy-cookie:hover {
+            background: var(--primary-accent);
+            color: white;
+            border-color: var(--primary-accent);
+        }
+
+        .btn-add-a-place {
+            font-family: var(--font-warm);
+            background: var(--primary-accent);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-add-a-place:hover {
+            background: var(--primary-hover);
+        }
+
+        /* --- PAGE VIEWS --- */
+        .page-view {
+            display: none;
+            flex: 1;
+            width: 100%;
+        }
+
+        .page-view.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- PAGE 1: EXPLORE THE MAP --- */
+        .hero-section {
+            padding: 30px 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .hero-title {
+            font-family: Georgia, serif;
+            font-size: 36px;
+            font-weight: 400;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+
+        .hero-subtitle {
+            color: #ede4d6;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .map-controls-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            overflow: visible;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 260px;
+            max-width: 320px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 36px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            background: white;
+            color: var(--text-main);
+            font-family: var(--font-warm);
+            font-size: 13px;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 14px;
+            top: 11px;
+            font-size: 11px;
+            opacity: 0.5;
+        }
+
+        /* Filter Pill Buttons Above Map */
+        .filter-btn {
+            background: white;
+            border: 2px solid transparent;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-family: var(--font-warm);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.1px;
+            cursor: pointer;
+            color: var(--text-main);
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            white-space: nowrap;
+            overflow: visible;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .filter-btn:hover {
+            background: #fffaf4;
+            transform: translateY(-1px);
+        }
+
+        .filter-btn .info-icon {
+            background: rgba(0, 0, 0, 0.08);
+            color: inherit;
+        }
+
+        /* --- SELECTED STATE: BROWN BACKGROUND (#D4A373) + GLOW OUTLINE --- */
+        .filter-btn.active {
+            background: #D4A373;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .filter-btn.active .info-icon {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        #btn-cat-all.active {
+            border-color: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        #btn-cat-approved.active {
+            border-color: #FFD700;
+            box-shadow: 0 0 12px #FFD700, 0 0 18px rgba(255, 215, 0, 0.5);
+        }
+
+        #btn-cat-friend.active {
+            border-color: #2ECC71;
+            box-shadow: 0 0 12px #2ECC71, 0 0 18px rgba(46, 204, 113, 0.5);
+        }
+
+        #btn-cat-featured.active {
+            border-color: #9D4EDD;
+            box-shadow: 0 0 12px #9D4EDD, 0 0 18px rgba(157, 78, 221, 0.5);
+        }
+
+        /* Map & Separate Right Sidebar Workspace */
+        .map-workspace-container {
+            max-width: 1400px;
+            margin: 0 auto 40px;
+            padding: 0 40px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 24px;
+        }
+
+        .map-workspace {
+            position: relative;
+            width: 100%;
+            height: 520px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--feed-border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            background: #111;
+        }
+
+        /* Leaflet Controls */
+        .leaflet-control-zoom, .leaflet-control-custom-reset, .leaflet-control-custom-nearest {
+            border: 1px solid var(--feed-border) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+            border-radius: 12px !important;
+            overflow: hidden;
+        }
+
+        .leaflet-control-zoom a, .leaflet-control-custom-reset a, .leaflet-control-custom-nearest a {
+            font-family: var(--font-warm) !important;
+            font-weight: 600 !important;
+            font-size: 12px !important;
+            color: #fff !important;
+            background-color: var(--feed-bg) !important;
+            border-bottom: 1px solid var(--feed-border) !important;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            text-decoration: none;
+            padding: 8px 12px !important;
+            white-space: nowrap;
+            width: auto !important;
+            height: auto !important;
+            gap: 6px;
+            border-radius: 12px !important;
+        }
+
+        .leaflet-control-custom-reset a:hover, .leaflet-control-custom-nearest a:hover {
+            background-color: var(--primary-accent) !important;
+            color: #140e0b !important;
+        }
+
+        /* Lighter Warm Feed Sidebar */
+        .sidebar {
+            width: 100%;
+            height: 520px;
+            background: var(--feed-bg);
+            border-radius: 14px;
+            border: 1px solid var(--feed-border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 14px 18px;
+            font-family: var(--font-warm);
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--feed-border);
+            background: var(--feed-header-bg);
+            color: var(--feed-header-text);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .sidebar-feed {
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .feed-region-title {
+            font-family: var(--font-warm);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #E8D5C8;
+            margin: 10px 4px 4px;
+            padding-bottom: 2px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+        }
+
+        .cookie-card {
+            display: flex;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            background: var(--feed-card-bg);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: all 0.2s ease;
+            position: relative;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .cookie-card:hover { 
+            background: var(--feed-card-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .cookie-card img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .cookie-card-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .cookie-card-title { font-weight: 700; font-size: 13px; font-family: var(--font-warm); color: var(--feed-text-main); }
+        .cookie-card-loc { font-size: 11px; color: var(--feed-text-muted); }
+        
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3px;
+        }
+
+        .cookie-card-rating { font-size: 11px; color: #b04b25; font-weight: 700; font-family: var(--font-warm); }
+
+        /* --- EXACT MATCH BADGES & CIRCULAR FILLED INFO ICONS --- */
+        .badge-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .badge {
+            font-family: var(--font-warm);
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 16px;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            letter-spacing: 0.4px;
+            border: none;
+        }
+
+        /* Approved Tag: Soft Warm Peach + Warm Brown Text */
+        .badge-approved { 
+            background: #FFE7D1; 
+            color: #B85C00; 
+        }
+
+        /* Community Tag: Soft Mint Green + Deep Forest Green Text */
+        .badge-friend { 
+            background: #D6F8D6; 
+            color: #1E7A27; 
+        }
+
+        /* Featured Tag: Soft Lavender + Vivid Purple Text */
+        .badge-featured { 
+            background: #E6DCFF; 
+            color: #6B38CE; 
+        }
+
+        /* Filled Circular Pill Info Icon */
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: 700;
+            font-style: normal;
+            cursor: pointer;
+            line-height: 1;
+            transition: opacity 0.2s ease;
+        }
+
+        .badge-approved .info-icon {
+            background: rgba(184, 92, 0, 0.18);
+            color: #B85C00;
+        }
+
+        .badge-friend .info-icon {
+            background: rgba(30, 122, 39, 0.18);
+            color: #1E7A27;
+        }
+
+        .badge-featured .info-icon {
+            background: rgba(107, 56, 206, 0.18);
+            color: #6B38CE;
+        }
+
+        .info-icon:hover { 
+            opacity: 0.8;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            width: 180px;
+            background-color: #2C1A0E;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 8px 10px;
+            position: absolute;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            font-size: 11px;
+            font-family: system-ui, sans-serif;
+            font-weight: 400;
+            text-transform: none;
+            line-height: 1.35;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+            pointer-events: none;
+            white-space: normal;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .badge-wrapper .tooltip-text {
+            bottom: 130%;
+            right: 0;
+        }
+
+        .badge-wrapper .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            right: 12px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #2C1A0E transparent transparent transparent;
+        }
+
+        .filter-btn .tooltip-text {
+            top: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .filter-btn .tooltip-text::after {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent #2C1A0E transparent;
+        }
+
+        .badge-wrapper:hover .tooltip-text, .filter-btn:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Compact Glowing Cookie Map Pins */
+        .cookie-pin-glow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(44, 26, 14, 0.95);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .cookie-pin-glow:hover {
+            transform: scale(1.2);
+        }
+
+        .glow-approved {
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 8px #FFD700, 0 0 14px rgba(255, 215, 0, 0.6);
+        }
+
+        .glow-friend {
+            border: 2px solid #2ECC71;
+            box-shadow: 0 0 8px #2ECC71, 0 0 14px rgba(46, 204, 113, 0.6);
+        }
+
+        .glow-featured {
+            border: 2px solid #9D4EDD;
+            box-shadow: 0 0 8px #9D4EDD, 0 0 14px rgba(157, 78, 221, 0.7);
+        }
+
+        .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
+            background-color: rgba(212, 163, 115, 0.25) !important;
+            border-radius: 50%;
+        }
+
+        .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
+            background-color: var(--primary-accent) !important;
+            color: #2C1A0E !important;
+            font-weight: bold;
+            font-family: var(--font-warm);
+        }
+
+        /* Leaflet Pop-up Container Base Styling */
+        .leaflet-popup-content-wrapper { 
+            border-radius: 14px; 
+            padding: 0; 
+            overflow: hidden; 
+            background: transparent;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+        }
+
+        .popup-box {
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .leaflet-popup-content { margin: 0 !important; width: 260px !important; }
+        .popup-img { width: 100%; height: 120px; object-fit: cover; display: block; background: #2A1A0F; }
+        
+        .popup-body { 
+            padding: 12px; 
+            background: #2C1A0E; 
+            color: #F7EBE1;
+            border-radius: 0 0 14px 14px;
+            transition: box-shadow 0.2s ease, border 0.2s ease;
+        }
+
+        /* Category Glowing Outlines Around Popups */
+        .popup-box.glow-approved-card {
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 12px #FFD700, 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .popup-box.glow-friend-card {
+            border: 2px solid #2ECC71;
+            box-shadow: 0 0 12px #2ECC71, 0 0 20px rgba(46, 204, 113, 0.5);
+        }
+
+        .popup-box.glow-featured-card {
+            border: 2px solid #9D4EDD;
+            box-shadow: 0 0 12px #9D4EDD, 0 0 20px rgba(157, 78, 221, 0.5);
+        }
+
+        .popup-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .popup-title { font-weight: 700; font-size: 14px; font-family: var(--font-warm); color: #fff; }
+        
+        /* Save / Heart Icon Button */
+        .btn-save-spot {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            line-height: 1;
+            padding: 0 2px;
+        }
+
+        .btn-save-spot:hover {
+            transform: scale(1.2);
+        }
+
+        .popup-text { font-size: 11px; color: #C4B1A5; margin-bottom: 8px; line-height: 1.4; }
+        
+        .popup-footer {
+            display: flex;
+            justify-content: flex-end; 
+            margin-top: 4px;
+        }
+
+        /* Warm Get Directions Button */
+        .directions-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            background: var(--primary-accent);
+            color: #2C1A0E !important;
+            border-radius: 6px;
+            font-size: 11px;
+            text-decoration: none;
+            font-family: var(--font-warm);
+            font-weight: 700;
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+        
+        .directions-btn:hover {
+            background: #e2b488;
+            transform: translateY(-1px);
+        }
+
+        /* --- SAVED SPOTS PAGE STYLING --- */
+        .saved-spots-container {
+            max-width: 1400px;
+            margin: 0 auto 40px;
+            padding: 0 40px;
+            width: 100%;
+        }
+
+        .empty-saved-msg {
+            background: var(--feed-bg);
+            border: 1px solid var(--feed-border);
+            padding: 40px;
+            border-radius: 14px;
+            text-align: center;
+            color: #E8D5C8;
+            font-family: var(--font-warm);
+            font-size: 15px;
+            margin-top: 20px;
+        }
+
+        /* --- PAGES 2 & 3: FORM LAYOUTS --- */
+        .form-page-container {
+            max-width: 1080px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 60px;
+            width: 100%;
+        }
+
+        .form-sidebar-title {
+            font-family: Georgia, serif;
+            font-size: 36px;
+            line-height: 1.2;
+            margin-bottom: 16px;
+            font-weight: 400;
+            color: #fff;
+        }
+
+        .form-sidebar-text {
+            color: #ede4d6;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .form-card {
+            background: white;
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+
+        .form-section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: var(--font-warm);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--card-border);
+            color: var(--text-main);
+        }
+
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: var(--font-warm);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background: #fff;
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            background: white;
+            border-color: var(--primary-accent);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            height: 90px;
+        }
+
+        .consent-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .consent-wrapper input[type="checkbox"] {
+            margin-top: 2px;
+            accent-color: var(--primary-accent);
+            cursor: pointer;
+        }
+
+        .btn-submit-form {
+            background: var(--primary-accent);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 20px;
+            font-family: var(--font-warm);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s ease;
+        }
+
+        .btn-submit-form:hover {
+            background: var(--primary-hover);
+        }
+
+        /* --- FOOTER & PRIVACY POLICY MODAL --- */
+        .footer {
+            padding: 30px 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #ede4d6;
+            background: var(--bg-warm);
+            margin-top: auto;
+        }
+
+        .footer-link {
+            color: #ede4d6;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .footer-link:hover { color: var(--primary-accent); }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: white;
+            color: var(--text-main);
+            width: 520px;
+            max-width: 90vw;
+            max-height: 85vh;
+            overflow-y: auto;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 12px;
+        }
+
+        .modal-title { font-weight: 700; font-size: 18px; font-family: var(--font-warm); }
+        .close-modal-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: #888; }
+        .privacy-content p { font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 14px; }
+        .privacy-content h4 { font-size: 14px; font-weight: 700; color: #222; margin: 16px 0 6px; font-family: var(--font-warm); }
+
+        /* --- MOBILE MEDIA QUERIES --- */
+        @media (max-width: 960px) {
+            .map-workspace-container { grid-template-columns: 1fr; padding: 0 16px; }
+            .sidebar { height: 400px; }
+            .map-workspace { height: 450px; }
+            .saved-spots-container { padding: 0 16px; }
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 10px 14px; height: auto; flex-wrap: wrap; gap: 8px; justify-content: space-between; }
+            .nav-brand { font-size: 16px; gap: 6px; }
+            .nav-links { gap: 10px; order: 3; width: 100%; justify-content: space-around; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 6px; }
+            .nav-link { font-size: 11px; }
+            
+            .header-actions { gap: 6px; }
+            .btn-buy-cookie, .btn-add-a-place { padding: 5px 10px; font-size: 10px; border-radius: 14px; }
+
+            .hero-section { padding: 16px 14px 10px; }
+            .hero-title { font-size: 20px; }
+            .hero-subtitle { font-size: 11px; margin-bottom: 10px; }
+            .map-controls-bar { gap: 6px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+            .search-box { min-width: 170px; max-width: 190px; }
+            .search-box input { padding: 7px 10px 7px 28px; font-size: 11px; }
+            .search-box::before { left: 10px; top: 8px; font-size: 9px; }
+            .filter-btn { padding: 5px 10px; font-size: 11px; }
+
+            .leaflet-control-custom-reset a, .leaflet-control-custom-nearest a {
+                padding: 5px 8px !important;
+                font-size: 10px !important;
+                border-radius: 8px !important;
+            }
+            .leaflet-control-zoom a {
+                padding: 4px 6px !important;
+                font-size: 11px !important;
+            }
+
+            .leaflet-popup-content { width: 200px !important; }
+            .popup-img { height: 90px; }
+            .popup-body { padding: 8px; }
+            .popup-title { font-size: 12px; }
+            .popup-text { font-size: 10px; margin-bottom: 6px; }
+            .directions-btn { padding: 4px 8px; font-size: 10px; }
+
+            .form-page-container { grid-template-columns: 1fr; gap: 20px; margin: 16px auto; padding: 0 14px; }
+            .form-sidebar-title { font-size: 24px; }
+            .form-card { padding: 16px 12px; }
+            .form-grid-2 { grid-template-columns: 1fr; gap: 0; }
+            .footer { padding: 16px 14px; flex-direction: column; gap: 6px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- GLOBAL NAVBAR HEADER -->
+    <nav class="navbar">
+        <a class="nav-brand" onclick="switchPage('page-map')">
+            🍪 Cookie Corner Atlas
+        </a>
+        
+        <ul class="nav-links">
+            <li><a id="link-map" class="nav-link active" onclick="switchPage('page-map')">Explore map</a></li>
+            <li><a id="link-saved" class="nav-link" onclick="switchPage('page-saved')">Saved Spots</a></li>
+            <li><a id="link-share" class="nav-link" onclick="switchPage('page-share')">Share Your Find</a></li>
+            <li><a id="link-bakery" class="nav-link" onclick="switchPage('page-bakery')">Bakery Partnership</a></li>
+        </ul>
+
+        <div class="header-actions">
+            <a href="https://buymeacoffee.com/" target="_blank" class="btn-buy-cookie" title="Support Cookie Corner Atlas">
+                ☕ Buy me a coffee
+            </a>
+            <button class="btn-add-a-place" onclick="switchPage('page-share')">Add a place +</button>
+        </div>
+    </nav>
+
+    <!-- ================= PAGE 1: MAP VIEW ================= -->
+    <div id="page-map" class="page-view active">
+        <div class="hero-section">
+            <h1 class="hero-title">Cookies Across Every Corner of the World.</h1>
+            <p class="hero-subtitle">Find your trip’s next detour, one community-shared cookie at a time.</p>
+            
+            <div class="map-controls-bar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="City, bakery..." onkeyup="filterFeed()">
+                </div>
+                <button id="btn-cat-all" class="filter-btn active" onclick="setCategory('all', this)">All Spots</button>
+                
+                <button id="btn-cat-approved" class="filter-btn" onclick="setCategory('approved', this)">
+                    Cookie Corner Approved
+                    <i class="info-icon">i</i>
+                    <span class="tooltip-text">Hand-picked & personally visited spots.</span>
+                </button>
+                
+                <button id="btn-cat-friend" class="filter-btn" onclick="setCategory('friend', this)">
+                    Community
+                    <i class="info-icon">i</i>
+                    <span class="tooltip-text">Submitted by trusted friends & cookie lovers.</span>
+                </button>
+                
+                <button id="btn-cat-featured" class="filter-btn" onclick="setCategory('featured', this)">
+                    Featured
+                    <i class="info-icon">i</i>
+                    <span class="tooltip-text">Sponsored spots & bakery partners.</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="map-workspace-container">
+            <!-- Leaflet Map Container -->
+            <div class="map-workspace">
+                <div id="map"></div>
+            </div>
+
+            <!-- Separate Right Sidebar Feed (Lighter Warm Theme) -->
+            <div id="sidebar" class="sidebar">
+                <div class="sidebar-header">
+                    <span>GLOBAL COOKIE FEED</span>
+                </div>
+                <div id="sidebarFeed" class="sidebar-feed"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 2: SAVED SPOTS ================= -->
+    <div id="page-saved" class="page-view">
+        <div class="hero-section">
+            <h1 class="hero-title">Your Saved Cookie Trail.</h1>
+            <p class="hero-subtitle">All your bookmarked spots ready for your next detour, organized by region.</p>
+        </div>
+
+        <div class="saved-spots-container">
+            <div id="savedFeed" class="sidebar-feed" style="background: var(--feed-bg); border-radius: 14px; padding: 20px; border: 1px solid var(--feed-border);"></div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 3: SHARE A FIND ================= -->
+    <div id="page-share" class="page-view">
+        <div class="form-page-container">
+            <div>
+                <h2 class="form-sidebar-title">Some finds are too good to keep.</h2>
+                <p class="form-sidebar-text">A hidden gem in a tiny neighbourhood. The franchise establishment that pleasantly surprised you. If there’s that one cookie you're still thinking about then why not help someone else find their next favourite!</p>
+            </div>
+
+            <div class="form-card">
+                <!-- Community Form Endpoint 1 -->
+                <form action="https://formspree.io/f/mwlvjbdq" method="POST">
+                    <!-- Formspree Auto-Redirect back to Map -->
+                    <input type="hidden" name="_next" value="https://yourwebsite.com">
+
+                    <div class="form-section-header">📍 Where's the cookie?</div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Bakery or place name *</label>
+                        <input type="text" name="bakery_name" class="form-input" required placeholder="e.g. Sunday Crumb">
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">City *</label>
+                            <input type="text" name="city" class="form-input" required placeholder="Cork">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Country *</label>
+                            <input type="text" name="country" class="form-input" required placeholder="Ireland">
+                        </div>
+                    </div>
+
+                    <div class="form-section-header" style="margin-top: 30px;">🍪 Tell us about that first bite</div>
+
+                    <div class="form-group">
+                        <label class="form-label">Cookie you ordered *</label>
+                        <input type="text" name="cookie_ordered" class="form-input" required placeholder="Miso chocolate chunk">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">What makes it special? *</label>
+                        <textarea name="description" class="form-textarea" required placeholder="Crisp edges, a soft middle, and just enough miso to balance..."></textarea>
+                    </div>
+
+                    <div class="form-section-header" style="margin-top: 30px;">👤 About you</div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Your Name *</label>
+                            <input type="text" name="user_name" class="form-input" required placeholder="Jane ‘Cookie’ Doe">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Your Email Address *</label>
+                            <input type="email" name="user_email" class="form-input" required placeholder="jane@example.com">
+                        </div>
+                    </div>
+
+                    <div class="consent-wrapper">
+                        <input type="checkbox" id="consent-community" required>
+                        <label for="consent-community">I agree to the <a class="footer-link" onclick="openPrivacyModal()">Privacy Policy</a>. Cookie Corner Atlas may collect my name and email to verify my submission and send occasional marketing emails or community updates.</label>
+                    </div>
+
+                    <button type="submit" class="btn-submit-form">Submit my find ➔</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 4: BAKERY PARTNERSHIP ================= -->
+    <div id="page-bakery" class="page-view">
+        <div class="form-page-container">
+            <div>
+                <h2 class="form-sidebar-title">Your cookies. Their next detour.</h2>
+                <p class="form-sidebar-text">Shop or bakery owner? Let's help cookie lovers find their way to your door. Partner with us to feature on our map with a special badge and secure your spot at the top of the Global Cookie Feed!</p>
+            </div>
+
+            <div class="form-card">
+                <!-- Partnership Form Endpoint 2 -->
+                <form action="https://formspree.io/f/mnpjyvko" method="POST">
+                    <!-- Formspree Auto-Redirect back to Map -->
+                    <input type="hidden" name="_next" value="https://yourwebsite.com">
+
+                    <div class="form-section-header">📌 Your place on the map</div>
+                    
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Bakery Name *</label>
+                            <input type="text" name="bakery_name" class="form-input" required placeholder="Sunday Crumb">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Website or Social *</label>
+                            <input type="url" name="website" class="form-input" required placeholder="https://yourwebsite.com">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">City *</label>
+                            <input type="text" name="city" class="form-input" required placeholder="Cork">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Country *</label>
+                            <input type="text" name="country" class="form-input" required placeholder="Ireland">
+                        </div>
+                    </div>
+
+                    <div class="form-section-header" style="margin-top: 30px;">👩‍🍳 Give us a taste of what you do</div>
+
+                    <div class="form-group">
+                        <label class="form-label">Your signature cookie *</label>
+                        <input type="text" name="signature_cookie" class="form-input" required placeholder="Irish Coffee Cookie">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tell cookie lovers about your bakery *</label>
+                        <textarea name="bakery_story" class="form-textarea" required placeholder="What makes your cookies yours? Tell us your story..."></textarea>
+                    </div>
+
+                    <div class="form-section-header" style="margin-top: 30px;">📧 Contact Details</div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Contact Name *</label>
+                            <input type="text" name="contact_name" class="form-input" required placeholder="Alex Smith">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Business Email Address *</label>
+                            <input type="email" name="contact_email" class="form-input" required placeholder="hello@yourbakery.com">
+                        </div>
+                    </div>
+
+                    <div class="consent-wrapper">
+                        <input type="checkbox" id="consent-partner" required>
+                        <label for="consent-partner">I agree to the <a class="footer-link" onclick="openPrivacyModal()">Privacy Policy</a>. I consent to Cookie Corner Atlas contacting me regarding partnership details, featured listings, and promotional opportunities.</label>
+                    </div>
+
+                    <button type="submit" class="btn-submit-form">Submit bakery listing ➔</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- GLOBAL FOOTER -->
+    <footer class="footer">
+        <div>Good cookies. Mapped. Everywhere.</div>
+        <div>
+            © 2026 Cookie Corner Atlas · <a class="footer-link" onclick="openPrivacyModal()">Privacy Policy</a>
+        </div>
+    </footer>
+
+    <!-- PRIVACY POLICY MODAL -->
+    <div id="privacyModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <span class="modal-title">Privacy Policy</span>
+                <button class="close-modal-btn" onclick="closePrivacyModal()">&times;</button>
+            </div>
+            <div class="privacy-content">
+                <p>Welcome to <strong>Cookie Corner Atlas</strong>. We respect your personal privacy and are committed to protecting the data you share with us.</p>
+                
+                <h4>1. Information We Collect</h4>
+                <p>When you submit a cookie spot or bakery partnership inquiry, we collect personal information including your name, email address, bakery details, and recommendations.</p>
+                
+                <h4>2. How We Use Your Data</h4>
+                <p>We use your information to verify submission details, coordinate partner listings, and communicate updates. By submitting your email, you agree that we may occasionally send you marketing communications or newsletters related to Cookie Corner Atlas.</p>
+
+                <h4>3. Data Protection & Opt-Out</h4>
+                <p>We never sell your personal information to third parties. You can request to be removed from our email communications at any time by contacting us or clicking unsubscribe in our emails.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet & MarkerCluster JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+
+    <script>
+        // --- SAVED SPOTS PERSISTENCE ---
+        let savedSpots = JSON.parse(localStorage.getItem('savedCookieSpots')) || [];
+
+        function toggleSaveSpot(spotId) {
+            const index = savedSpots.indexOf(spotId);
+            if (index > -1) {
+                savedSpots.splice(index, 1);
+            } else {
+                savedSpots.push(spotId);
+            }
+            localStorage.setItem('savedCookieSpots', JSON.stringify(savedSpots));
+            
+            updateSaveButtons(spotId);
+            renderSavedFeed();
+        }
+
+        function updateSaveButtons(spotId) {
+            const btn = document.getElementById(`save-btn-${spotId}`);
+            if (btn) {
+                const isSaved = savedSpots.includes(spotId);
+                btn.innerHTML = isSaved ? '❤️' : '🤍';
+                btn.title = isSaved ? 'Remove from Saved Spots' : 'Save Spot';
+            }
+        }
+
+        // --- PAGE SWITCHING NAVIGATION LOGIC ---
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+            document.getElementById(pageId).classList.add('active');
+
+            if (pageId === 'page-map') {
+                document.getElementById('link-map').classList.add('active');
+                setTimeout(() => map.invalidateSize(), 100);
+            } else if (pageId === 'page-saved') {
+                document.getElementById('link-saved').classList.add('active');
+                renderSavedFeed();
+            } else if (pageId === 'page-share') {
+                document.getElementById('link-share').classList.add('active');
+            } else if (pageId === 'page-bakery') {
+                document.getElementById('link-bakery').classList.add('active');
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // --- STEP 3: DYNAMIC DATA FETCHING ---
+        let cookieSpots = [];
+
+        // --- LEAFLET MAP ENGINE INITIALIZATION ---
+        var worldBounds = L.latLngBounds(L.latLng(-85, -180), L.latLng(85, 180));
+        var map = L.map('map', {
+            minZoom: 2,
+            maxBounds: worldBounds,
+            maxBoundsViscosity: 1.0,
+            zoomSnap: 0.25,
+            zoomControl: true
+        });
+
+        // Dark Matter Tile Layer
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_4o1q_1_3a68aa69c659118c36b99979', {
+            maxZoom: 19,
+            noWrap: true,
+            bounds: worldBounds,
+            attribution: '&copy; OpenStreetMap & CARTO'
+        }).addTo(map);
+
+        // Marker Cluster Group
+        var cookieClusters = L.markerClusterGroup({ 
+            showCoverageOnHover: false, 
+            maxClusterRadius: 30,          
+            disableClusteringAtZoom: 9      
+        });
+
+        /* Compact Glowing Cookie Pins */
+        var approvedIcon = L.divIcon({ html: '<div class="cookie-pin-glow glow-approved">🍪</div>', className: '', iconSize: [22, 22], iconAnchor: [11, 11], popupAnchor: [0, -11] });
+        var friendIcon = L.divIcon({ html: '<div class="cookie-pin-glow glow-friend">🍪</div>', className: '', iconSize: [22, 22], iconAnchor: [11, 11], popupAnchor: [0, -11] });
+        var featuredIcon = L.divIcon({ html: '<div class="cookie-pin-glow glow-featured">🍪</div>', className: '', iconSize: [22, 22], iconAnchor: [11, 11], popupAnchor: [0, -11] });
+
+        var markersMap = {};
+        var allMarkersCoords = [];
+        var activeCategoryFilter = 'all';
+        var globalBounds = null;
+
+        function focusSpotOnMap(lat, lng) {
+            map.flyTo([lat, lng], 16, { duration: 1.2, offset: [0, -140] });
+        }
+
+        function initMapMarkers() {
+            markersMap = {};
+            allMarkersCoords = [];
+            cookieClusters.clearLayers();
+
+            cookieSpots.forEach(spot => {
+                let glowCardClass = 'glow-approved-card';
+                let chosenIcon = approvedIcon;
+
+                if (spot.category === 'friend') {
+                    chosenIcon = friendIcon;
+                    glowCardClass = 'glow-friend-card';
+                } else if (spot.category === 'featured') {
+                    chosenIcon = featuredIcon;
+                    glowCardClass = 'glow-featured-card';
+                }
+
+                const isSaved = savedSpots.includes(spot.id);
+                const heartIcon = isSaved ? '❤️' : '🤍';
+
+                var popupContent = document.createElement('div');
+                popupContent.className = `popup-box ${glowCardClass}`;
+                popupContent.innerHTML = `
+                    <img src="${spot.img}" class="popup-img" alt="${spot.name}">
+                    <div class="popup-body">
+                        <div class="popup-header-row">
+                            <div class="popup-title">${spot.name}</div>
+                            <button id="save-btn-${spot.id}" class="btn-save-spot" onclick="toggleSaveSpot(${spot.id})" title="${isSaved ? 'Remove from Saved Spots' : 'Save Spot'}">${heartIcon}</button>
+                        </div>
+                        <div class="popup-text"><b>Location:</b> ${spot.location}<br>${spot.desc}</div>
+                        <div class="popup-footer">
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}" target="_blank" class="directions-btn">Get Directions ↗</a>
+                        </div>
+                    </div>
+                `;
+
+                var btnDir = popupContent.querySelector('.directions-btn');
+                L.DomEvent.disableClickPropagation(btnDir);
+                var btnSave = popupContent.querySelector('.btn-save-spot');
+                L.DomEvent.disableClickPropagation(btnSave);
+
+                var marker = L.marker([spot.lat, spot.lng], { icon: chosenIcon });
+                marker.bindPopup(popupContent, { autoPanPadding: [20, 50] });
+                
+                marker.on('click', function() {
+                    cookieClusters.zoomToShowLayer(marker, function() {
+                        setTimeout(() => {
+                            marker.openPopup();
+                            focusSpotOnMap(spot.lat, spot.lng);
+                        }, 150);
+                    });
+                });
+
+                cookieClusters.addLayer(marker);
+                markersMap[spot.id] = { marker: marker, spot: spot };
+                allMarkersCoords.push([spot.lat, spot.lng]);
+            });
+
+            map.addLayer(cookieClusters);
+            if (allMarkersCoords.length > 0) {
+                globalBounds = L.latLngBounds(allMarkersCoords);
+                resetWorldView();
+            }
+        }
+
+        // --- FETCH SPOTS FROM EXTERNAL SPOTS.JSON ---
+        fetch('./spots.json')
+            .then(response => response.json())
+            .then(data => {
+                cookieSpots = data;
+                initMapMarkers();
+                filterFeed();
+            })
+            .catch(error => console.error('Error loading spots.json:', error));
+
+        function resetWorldView() {
+            if (globalBounds) {
+                map.closePopup(); 
+                map.fitBounds(globalBounds, { padding: [100, 100] });
+            }
+        }
+
+        // Custom Reset World View Button
+        var ResetViewControl = L.Control.extend({
+            options: { position: 'topleft' },
+            onAdd: function (map) {
+                var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom-reset');
+                var button = L.DomUtil.create('a', '', container);
+                button.innerHTML = 'Reset view 🌐';
+                button.href = '#';
+                button.title = 'Reset World View';
+                button.role = 'button';
+
+                L.DomEvent.disableClickPropagation(container);
+                L.DomEvent.on(button, 'click', function (e) {
+                    L.DomEvent.preventDefault(e);
+                    resetWorldView();
+                });
+
+                return container;
+            }
+        });
+        map.addControl(new ResetViewControl());
+
+        // Custom Find Nearest Cookie Button
+        var NearestCookieControl = L.Control.extend({
+            options: { position: 'topleft' },
+            onAdd: function (map) {
+                var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom-nearest');
+                var button = L.DomUtil.create('a', '', container);
+                button.innerHTML = 'Find nearest cookie 🎯';
+                button.href = '#';
+                button.title = 'Find Nearest Cookie';
+                button.role = 'button';
+
+                L.DomEvent.disableClickPropagation(container);
+                L.DomEvent.on(button, 'click', function (e) {
+                    L.DomEvent.preventDefault(e);
+                    findNearestCookie();
+                });
+
+                return container;
+            }
+        });
+        map.addControl(new NearestCookieControl());
+
+        function findNearestCookie() {
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser");
+                return;
+            }
+
+            var allSpotsBtn = document.getElementById('btn-cat-all');
+            setCategory('all', allSpotsBtn);
+
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var userLat = position.coords.latitude;
+                var userLng = position.coords.longitude;
+
+                let closestSpot = null;
+                let minDistance = Infinity;
+
+                cookieSpots.forEach(spot => {
+                    let dist = getDistanceFromLatLonInKm(userLat, userLng, spot.lat, spot.lng);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        closestSpot = spot;
+                    }
+                });
+
+                if (closestSpot) {
+                    var item = markersMap[closestSpot.id];
+                    cookieClusters.zoomToShowLayer(item.marker, function() {
+                        setTimeout(() => {
+                            item.marker.openPopup();
+                            focusSpotOnMap(closestSpot.lat, closestSpot.lng);
+                        }, 200);
+                    });
+                }
+            }, function () {
+                alert("Unable to retrieve your location. Please check your browser permissions.");
+            });
+        }
+
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            var R = 6371; 
+            var dLat = deg2rad(lat2 - lat1);
+            var dLon = deg2rad(lon2 - lon1);
+            var a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2); 
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            return R * c; 
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI/180);
+        }
+
+        // --- RENDER SIDEBAR FEED ---
+        function renderFeed(spots) {
+            var feedEl = document.getElementById('sidebarFeed');
+            if (!feedEl) return;
+            feedEl.innerHTML = '';
+            
+            var featuredSpots = spots.filter(s => s.category === 'featured');
+            var standardSpots = spots.filter(s => s.category !== 'featured');
+
+            if (featuredSpots.length > 0) {
+                var featTitle = document.createElement('div');
+                featTitle.className = 'feed-region-title';
+                featTitle.innerText = '⭐ Featured Partners';
+                feedEl.appendChild(featTitle);
+
+                featuredSpots.forEach(spot => appendCardToFeed(spot, feedEl));
+            }
+
+            var regions = {};
+            standardSpots.forEach(spot => {
+                let reg = spot.region || 'Other Regions';
+                if (!regions[reg]) regions[reg] = [];
+                regions[reg].push(spot);
+            });
+
+            Object.keys(regions).sort().forEach(regionName => {
+                var regTitle = document.createElement('div');
+                regTitle.className = 'feed-region-title';
+                regTitle.innerText = '📍 ' + regionName;
+                feedEl.appendChild(regTitle);
+
+                regions[regionName].forEach(spot => appendCardToFeed(spot, feedEl));
+            });
+        }
+
+        // --- RENDER SAVED SPOTS PAGE FEED ---
+        function renderSavedFeed() {
+            var feedEl = document.getElementById('savedFeed');
+            if (!feedEl) return;
+            feedEl.innerHTML = '';
+
+            const savedList = cookieSpots.filter(spot => savedSpots.includes(spot.id));
+
+            if (savedList.length === 0) {
+                feedEl.innerHTML = '<div class="empty-saved-msg">You haven\'t saved any cookie spots yet! Click the heart icon (🤍) on any spot popup to bookmark it here.</div>';
+                return;
+            }
+
+            var regions = {};
+            savedList.forEach(spot => {
+                let reg = spot.region || 'Other Regions';
+                if (!regions[reg]) regions[reg] = [];
+                regions[reg].push(spot);
+            });
+
+            Object.keys(regions).sort().forEach(regionName => {
+                var regTitle = document.createElement('div');
+                regTitle.className = 'feed-region-title';
+                regTitle.innerText = '📍 ' + regionName;
+                feedEl.appendChild(regTitle);
+
+                regions[regionName].forEach(spot => appendCardToFeed(spot, feedEl, true));
+            });
+        }
+
+        function appendCardToFeed(spot, container, isSavedPage = false) {
+            let badgeClass = 'badge-approved';
+            let badgeText = 'Cookie Corner Approved';
+            let tooltipText = 'Hand-picked and personally visited spots verified for top-tier quality.';
+
+            if (spot.category === 'friend') { 
+                badgeClass = 'badge-friend'; 
+                badgeText = 'Community'; 
+                tooltipText = 'Recommended and submitted by trusted friends and fellow cookie lovers.';
+            }
+            if (spot.category === 'featured') { 
+                badgeClass = 'badge-featured'; 
+                badgeText = 'Featured'; 
+                tooltipText = 'Sponsored spots and official bakery partners showcased on our atlas.';
+            }
+
+            var card = document.createElement('div');
+            card.className = 'cookie-card';
+            card.innerHTML = `
+                <img src="${spot.img}" alt="${spot.name}">
+                <div class="cookie-card-info">
+                    <div class="cookie-card-title">${spot.name}</div>
+                    <div class="cookie-card-loc">${spot.location}</div>
+                    <div class="card-footer">
+                        <span class="cookie-card-rating">${spot.rating}</span>
+                        <div class="badge-wrapper">
+                            <span class="badge ${badgeClass}">
+                                ${badgeText}
+                                <i class="info-icon">i</i>
+                            </span>
+                            <span class="tooltip-text">${tooltipText}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            card.onclick = function() {
+                switchPage('page-map');
+                var item = markersMap[spot.id];
+                if (item) {
+                    cookieClusters.zoomToShowLayer(item.marker, function() {
+                        setTimeout(() => {
+                            item.marker.openPopup();
+                            focusSpotOnMap(spot.lat, spot.lng);
+                        }, 200);
+                    });
+                }
+            };
+
+            container.appendChild(card);
+        }
+
+        // --- SEARCH, FILTER & AUTO-SORTING LOGIC ---
+        function filterFeed() {
+            var searchInput = document.getElementById('searchInput');
+            var query = searchInput ? searchInput.value.toLowerCase() : '';
+            
+            var filtered = cookieSpots.filter(spot => {
+                var matchesCategory = (activeCategoryFilter === 'all' || spot.category === activeCategoryFilter);
+                var matchesSearch = spot.name.toLowerCase().includes(query) || spot.location.toLowerCase().includes(query) || spot.desc.toLowerCase().includes(query);
+                return matchesCategory && matchesSearch;
+            });
+
+            renderFeed(filtered);
+            updateMapMarkersVisibility();
+        }
+
+        function setCategory(cat, btnElement) {
+            activeCategoryFilter = cat;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
+            filterFeed();
+        }
+
+        function updateMapMarkersVisibility() {
+            var searchInput = document.getElementById('searchInput');
+            var query = searchInput ? searchInput.value.toLowerCase() : '';
+
+            Object.values(markersMap).forEach(item => {
+                var spot = item.spot;
+                var marker = item.marker;
+
+                var matchesCategory = (activeCategoryFilter === 'all' || spot.category === activeCategoryFilter);
+                var matchesSearch = spot.name.toLowerCase().includes(query) || spot.location.toLowerCase().includes(query) || spot.desc.toLowerCase().includes(query);
+
+                if (matchesCategory && matchesSearch) {
+                    if (!cookieClusters.hasLayer(marker)) cookieClusters.addLayer(marker);
+                } else {
+                    if (cookieClusters.hasLayer(marker)) cookieClusters.removeLayer(marker);
+                }
+            });
+        }
+
+        // --- PRIVACY MODAL LOGIC ---
+        function openPrivacyModal() {
+            document.getElementById('privacyModal').classList.add('active');
+        }
+
+        function closePrivacyModal() {
+            document.getElementById('privacyModal').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
