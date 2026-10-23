@@ -583,10 +583,11 @@
         }
 
         .filter-btn .tooltip-text {
-            top: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-        }
+    top: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999; /* Ensures tooltip always renders above all elements */
+}
 
         .filter-btn .tooltip-text::after {
             content: "";
@@ -1006,17 +1007,16 @@
                 min-height: 34px;
                 font-size: 12px;
             }
-
+            
             /* MOBILE ROW 3: CENTERED REMAINING 3 CATEGORIES */
-            .filter-buttons-wrapper {
-                display: flex;
-                justify-content: center; /* Centers Approved, Community & Featured buttons */
-                gap: 6px;
-                overflow-x: auto;
-                padding-bottom: 4px;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-                width: 100%;
+.filter-buttons-wrapper {
+    display: flex;
+    justify-content: center; /* Centers Approved, Community & Featured buttons */
+    gap: 6px;
+    width: 100%;
+    flex-wrap: wrap; /* Allows buttons to fit cleanly without overflowing or scrolling */
+    overflow-x: visible; /* <--- Prevents bouncing/scrolling */
+    padding-bottom: 4px;
             }
 
             .filter-buttons-wrapper::-webkit-scrollbar {
