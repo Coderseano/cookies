@@ -5,10 +5,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- Warm Google Font: Quicksand -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
+   <!-- Google Fonts: DynaPuff (Funky Headings) & Quicksand (Warm Body Text) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Leaflet CSS & MarkerCluster CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -17,26 +17,28 @@
     
     <style>
         :root {
-            --primary-accent: #D4A373;
-            --primary-hover: #b04b25;
-            --bg-warm: #5C3A21;
-            --card-bg: #f9f4ec;
-            --card-border: #ede4d6;
-            --text-main: #2c2523;
-            --text-muted: #786c67;
-            --font-warm: 'Quicksand', system-ui, -apple-system, sans-serif;
+    --primary-accent: #D4A373;
+    --primary-hover: #b04b25;
+    --bg-warm: #5C3A21;
+    --card-bg: #f9f4ec;
+    --card-border: #ede4d6;
+    --text-main: #2c2523;
+    --text-muted: #786c67;
+    
+    /* Font Families */
+    --font-warm: 'Quicksand', system-ui, -apple-system, sans-serif;
+    --font-funky: 'DynaPuff', cursive, system-ui, sans-serif;
 
-            /* Lighter Warm Feed Variables */
-            --feed-bg: #472B18;
-            --feed-border: rgba(255, 255, 255, 0.1);
-            --feed-card-bg: #F7EBE1;
-            --feed-card-hover: #FFFFFF;
-            --feed-text-main: #2C1A0E;
-            --feed-text-muted: #7A5C47;
-            --feed-header-bg: #382112;
-            --feed-header-text: #E8D5C8;
-        }
-
+    /* Lighter Warm Feed Variables */
+    --feed-bg: #472B18;
+    --feed-border: rgba(255, 255, 255, 0.1);
+    --feed-card-bg: #F7EBE1;
+    --feed-card-hover: #FFFFFF;
+    --feed-text-main: #2C1A0E;
+    --feed-text-muted: #7A5C47;
+    --feed-header-bg: #382112;
+    --feed-header-text: #E8D5C8;
+}
         * {
             box-sizing: border-box;
             margin: 0;
@@ -73,7 +75,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            font-family: var(--font-warm);
+            font-family: var(--font-funky);
             font-weight: 700;
             font-size: 22px;
             color: #fff;
@@ -175,7 +177,7 @@
         }
 
         .hero-title {
-            font-family: Georgia, serif;
+            font-family: var(--font-funky);
             font-size: 36px;
             font-weight: 400;
             margin-bottom: 6px;
@@ -756,7 +758,7 @@
         }
 
         .form-sidebar-title {
-            font-family: Georgia, serif;
+            font-family: var(--font-funky);
             font-size: 36px;
             line-height: 1.2;
             margin-bottom: 16px;
