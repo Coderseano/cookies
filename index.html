@@ -652,20 +652,20 @@
 
         /* Leaflet Pop-up Container Base Styling */
         .leaflet-popup-content-wrapper { 
-            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; 
-            padding: 0; 
-            overflow: hidden; 
-            background: transparent;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
-        }
+    border-radius: 0 0 255px 15px/15px 225px 15px 255px; /* Only round the bottom corners */
+    padding: 0; 
+    overflow: hidden; 
+    background: transparent;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+}
 
-        .popup-box {
-            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-            overflow: hidden;
+.popup-box {
+    border-radius: 0 0 255px 15px/15px 225px 15px 255px;
+    overflow: hidden;
         }
 
         .leaflet-popup-content { margin: 0 !important; width: 260px !important; }
-        .popup-img { width: 100%; height: 120px; object-fit: cover; display: block; background: #2A1A0F; }
+        .popup-img { width: 100%; height: 120px; object-fit: cover; display: block; background: #2A1A0F;border-radius: 0; /* Keep top flush */ }
         
         .popup-body { 
             padding: 12px; 
