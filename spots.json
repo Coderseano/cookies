@@ -334,5 +334,18 @@
     "rating": "4.0 ⭐",
     "desc": "Aesthetic spot offering a large variety of cookies in the heart of Shinjuku ",
     "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9v64WSQ494cPOEUbLQBRofjOFka8xGTWeqy1qODJSJrO2k5J0lFZX78M&s=10"
-  }
+  },
+  {
+    "id": 30,
+    "name": "MONSTA SWEETS (モンスタ スイーツ)",
+    "location": "Suginami City, Tokyo, Japan",
+    "region": "Asia",
+    "category": "community",
+    "lat": 35.708245269116276,
+    "lng": 1139.65076146034798,
+    "rating": "4.8 ⭐",
+    "desc": "Cute cafe offering fun and unqiue American-style sweets, including cookies!",
+    "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSm3HVTKdkrwN0-NjNMuwlK5uQTcZ-KnK6ON99y1G_E9y_mmmoPndfxFxE&s=10"
+      },
 ]
+ 
