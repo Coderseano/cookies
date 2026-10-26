@@ -323,7 +323,7 @@
     "desc": "Freshly baked homemade cookies in a historic neighbourhood",
     "img": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2e/74/e6/38/freshly-baked-pistacchio.jpg?w=1100&h=1100&s=1"
   },
-    {
+  {
     "id": 29,
     "name": "TheCookie594",
     "location": "Shinjuku City, Tokyo, Japan",
@@ -346,5 +346,5 @@
     "rating": "4.8 ⭐",
     "desc": "Cute cafe offering fun and unqiue American-style sweets, including cookies!",
     "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSm3HVTKdkrwN0-NjNMuwlK5uQTcZ-KnK6ON99y1G_E9y_mmmoPndfxFxE&s=10"
-      }
+  }
 ]
